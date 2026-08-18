@@ -1,3 +1,4 @@
+import { GAMING_TRACKERS } from "@/lib/gaming";
 import type { DocumentContent } from "./types";
 
 export const documents: Record<string, DocumentContent> = {
@@ -28,7 +29,7 @@ export const documents: Record<string, DocumentContent> = {
           "about.md — the human patch notes.",
           "career.md — jobs, in chronological self-roast.",
           "projects.ts — things I built instead of going outside.",
-          "extras/ — hobbies, gaming (accounts incoming), YouTube, the blog.",
+          "extras/ — hobbies, gaming (PSN, Steam, Valorant), YouTube, the blog.",
           "Outline — individual posts, because I process trauma as markdown.",
         ],
       },
@@ -237,7 +238,7 @@ export const documents: Record<string, DocumentContent> = {
       },
       {
         type: "p",
-        text: "The rest of this window is jobs and repos. This file is basketball, printers, boards, cameras, and playlists. Games got their own file because I am about to dox my rank on purpose.",
+        text: "The rest of this window is jobs and repos. This file is basketball, printers, boards, cameras, and playlists. Games got their own file because I doxed the rank on purpose.",
       },
       {
         type: "h2",
@@ -261,27 +262,24 @@ export const documents: Record<string, DocumentContent> = {
     blocks: [
       {
         type: "callout",
-        text: "This page is a dock. PSN, Valorant, and whatever else I am willing to put next to my résumé will plug in here.",
+        text: "The dock shipped. PSN, Steam, and a Valorant tracker sitting next to the résumé on purpose.",
       },
       {
         type: "p",
-        text: "Hobbies.md got the analog stuff. This file is for accounts with APIs, because ranked anxiety deserves structured data. Until the hooks land, treat the slots below as TODOs with better lighting.",
+        text: "Hobbies.md got the analog stuff. This file is ranked anxiety with URLs. Riot ID iresharma#noob, PSN iresharma, Steam ireshrma. Add me if the tag does not scare you.",
       },
+      {
+        type: "p",
+        text: "I have 106 GitHub repos and a LeetCode profile I maintain after saying competitive programming never attracted me. The trackers below have the same energy: casual in the copy, unhinged in the friend request.",
+      },
+      { type: "live", source: "gaming" },
       {
         type: "h2",
-        text: "Queued",
+        text: "Elsewhere",
       },
       {
-        type: "ul",
-        items: [
-          "PlayStation Network — trophies, if Sony and I can agree on an API.",
-          "Valorant — rank, if production is allowed to know.",
-          "Whatever else I still pretend I am casual about.",
-        ],
-      },
-      {
-        type: "p",
-        text: "I have 106 GitHub repos and a LeetCode profile I maintain after saying competitive programming never attracted me. The tracker for this page will have the same energy: casual in the copy, unhinged in the JSON.",
+        type: "links",
+        items: GAMING_TRACKERS,
       },
     ],
   },

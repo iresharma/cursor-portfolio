@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { BlogLive } from "@/components/editor/BlogLive";
+import { GamingLive } from "@/components/editor/GamingLive";
 import { YouTubeLive } from "@/components/editor/YouTubeLive";
 import { cn } from "@/lib/cn";
 import { documents } from "@/lib/workspace/documents";
@@ -112,11 +113,9 @@ function MarkdownView({
             );
           }
           if (block.type === "live") {
-            return block.source === "blog" ? (
-              <BlogLive key={index} />
-            ) : (
-              <YouTubeLive key={index} />
-            );
+            if (block.source === "blog") return <BlogLive key={index} />;
+            if (block.source === "gaming") return <GamingLive key={index} />;
+            return <YouTubeLive key={index} />;
           }
           return <p key={index}>{block.text}</p>;
         })}
