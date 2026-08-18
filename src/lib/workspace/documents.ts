@@ -337,23 +337,20 @@ export const documents: Record<string, DocumentContent> = {
       },
       {
         type: "p",
-        text: "Individual posts also live in the Outline, like a second index I will not keep in sync. This file is the front door. That panel is the grep.",
+        text: "Individual posts also live in the Outline, like a second index I will not keep in sync. This file is the front door. That panel is the grep. Numbers below are scraped off the homepage once a day, because paying Hashnode for JSON felt like a bit.",
+      },
+      { type: "live", source: "blog" },
+      {
+        type: "h2",
+        text: "Elsewhere",
       },
       {
         type: "links",
         items: [
-          { label: "blog.iresharma.com", href: "https://blog.iresharma.com" },
+          { label: "blog.iresharma.com — WatchIreshStruggle", href: "https://blog.iresharma.com" },
           {
-            label: "Why a coding agent needs three ways to read code",
-            href: "https://blog.iresharma.com/why-a-coding-agent-needs-three-different-ways-to-read-code",
-          },
-          {
-            label: "I never finished Venture Deals, so I built a pipeline",
-            href: "https://blog.iresharma.com/i-never-finished-venture-deals-so-i-built-a-pipeline-to-read-it-for-me",
-          },
-          {
-            label: "YouTube Shorts generator deep dive",
-            href: "https://blog.iresharma.com/building-an-ai-powered-youtube-shorts-generator-a-complete-technical-deep-dive",
+            label: "hashnode.com/@Iresharma",
+            href: "https://hashnode.com/@Iresharma",
           },
         ],
       },

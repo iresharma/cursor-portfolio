@@ -1,5 +1,6 @@
 "use client";
 
+import { BlogLive } from "@/components/editor/BlogLive";
 import { YouTubeLive } from "@/components/editor/YouTubeLive";
 import { documents } from "@/lib/workspace/documents";
 import type { DocumentContent } from "@/lib/workspace/types";
@@ -93,7 +94,11 @@ function MarkdownView({
             );
           }
           if (block.type === "live") {
-            return <YouTubeLive key={index} />;
+            return block.source === "blog" ? (
+              <BlogLive key={index} />
+            ) : (
+              <YouTubeLive key={index} />
+            );
           }
           return <p key={index}>{block.text}</p>;
         })}
