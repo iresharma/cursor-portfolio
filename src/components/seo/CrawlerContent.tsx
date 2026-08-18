@@ -1,11 +1,10 @@
 import { documents } from "@/lib/workspace/documents";
 import type { DocumentContent, MarkdownBlock } from "@/lib/workspace/types";
-import { SITE_DESCRIPTION, SITE_TITLE } from "@/lib/site";
+import { SITE_DESCRIPTION } from "@/lib/site";
 
 export function CrawlerContent() {
   return (
     <section className="sr-only" aria-hidden="true">
-      <h1>{SITE_TITLE}</h1>
       <p>{SITE_DESCRIPTION}</p>
       {Object.entries(documents).map(([id, doc]) => (
         <article key={id}>
