@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FileGlyph } from "@/components/icons/FileGlyph";
+import { SymbolGlyph } from "@/components/icons/SymbolGlyph";
 import { cn } from "@/lib/cn";
 import { searchWorkspace } from "@/lib/workspace/queries";
 import { useWorkbench } from "@/state/workbench-context";
@@ -27,7 +28,14 @@ function CommandPaletteDialog() {
   const openIndex = (index: number) => {
     const item = results[index];
     if (!item) return;
-    openFile(item.kind === "file" ? item.node.id : item.item.id);
+    if (item.kind === "file") openFile(item.node.id);
+    else if (item.kind === "outline") openFile(item.item.id);
+    else {
+      openFile(item.symbol.fileId, {
+        heading: item.symbol.heading,
+        symbolId: item.symbol.id,
+      });
+    }
   };
 
   return (
@@ -79,12 +87,24 @@ function CommandPaletteDialog() {
             </li>
           ) : (
             results.map((item, index) => {
-              const id = item.kind === "file" ? item.node.id : item.item.id;
-              const name = item.kind === "file" ? item.node.name : item.item.name;
+              const id =
+                item.kind === "file"
+                  ? item.node.id
+                  : item.kind === "outline"
+                    ? item.item.id
+                    : item.symbol.id;
+              const name =
+                item.kind === "file"
+                  ? item.node.name
+                  : item.kind === "outline"
+                    ? item.item.name
+                    : item.symbol.label;
               const subtitle =
                 item.kind === "file"
                   ? item.path.slice(0, -1).join("/") || "iresharma"
-                  : "outline";
+                  : item.kind === "outline"
+                    ? "outline"
+                    : item.symbol.detail ?? "career.md";
               return (
                 <li key={`${item.kind}-${id}`}>
                   <button
@@ -96,12 +116,16 @@ function CommandPaletteDialog() {
                       index === activeIndex ? "bg-selection text-fg" : "text-muted",
                     )}
                   >
-                    <FileGlyph
-                      kind="file"
-                      language={
-                        item.kind === "file" ? item.node.language : "markdown"
-                      }
-                    />
+                    {item.kind === "symbol" ? (
+                      <SymbolGlyph kind={item.symbol.kind} />
+                    ) : (
+                      <FileGlyph
+                        kind="file"
+                        language={
+                          item.kind === "file" ? item.node.language : "markdown"
+                        }
+                      />
+                    )}
                     <span className="min-w-0 flex-1 truncate">{name}</span>
                     <span className="truncate text-[11px] text-dim">
                       {subtitle}

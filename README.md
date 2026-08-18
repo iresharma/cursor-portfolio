@@ -2,15 +2,15 @@
 
 Software engineering portfolio with two surfaces:
 
-- **Desktop** — a Cursor editor window. Explorer is the site map, the editor opens pages, chat is the future agent.
-- **Mobile** — a short boot, then a chat: about, chips, and an input that will plug into the same agent.
+- **Desktop** — a Cursor editor window. Explorer is the site map, the editor opens pages, chat is an agent that only talks about Iresh.
+- **Mobile** — a short boot, then the same agent: about, chips, five replies, then it is broke.
 
 ## Where content lives
 
 - File tree: `src/lib/workspace/tree.ts`
 - Page bodies: `src/lib/workspace/documents.ts`
 - Mobile chips and copy: `src/lib/mobile/content.ts`
-- Agent stub: `src/lib/mobile/agent.ts`
+- Agent: `src/lib/agent/` plus `POST /api/chat` (OpenRouter, 5-message quota)
 
 ## Desktop shortcuts
 

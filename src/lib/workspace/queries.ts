@@ -1,5 +1,6 @@
 import { fileTree, outlineItems } from "./tree";
-import type { OutlineItem, WorkspaceNode } from "./types";
+import { flattenOutline, outlineTree } from "./outline";
+import type { OutlineItem, OutlineSymbol, WorkspaceNode } from "./types";
 
 export function flattenFiles(node: WorkspaceNode = fileTree): WorkspaceNode[] {
   const files: WorkspaceNode[] = [];
@@ -87,6 +88,7 @@ export function getOpenable(
 export function searchWorkspace(query: string): Array<
   | { kind: "file"; node: WorkspaceNode; path: string[] }
   | { kind: "outline"; item: OutlineItem }
+  | { kind: "symbol"; symbol: OutlineSymbol }
 > {
   const needle = query.trim().toLowerCase();
   const files = flattenFiles().flatMap((node) => {
@@ -102,5 +104,12 @@ export function searchWorkspace(query: string): Array<
     return [{ kind: "outline" as const, item }];
   });
 
-  return [...files, ...posts];
+  const symbols = flattenOutline(outlineTree()).flatMap((symbol) => {
+    if (outlineItems.some((item) => item.id === symbol.id)) return [];
+    const haystack = `${symbol.label} ${symbol.detail ?? ""}`.toLowerCase();
+    if (needle && !haystack.includes(needle)) return [];
+    return [{ kind: "symbol" as const, symbol }];
+  });
+
+  return [...files, ...symbols, ...posts];
 }

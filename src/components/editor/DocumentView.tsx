@@ -1,10 +1,14 @@
 "use client";
 
+import { useEffect } from "react";
 import { BlogLive } from "@/components/editor/BlogLive";
 import { GamingLive } from "@/components/editor/GamingLive";
 import { YouTubeLive } from "@/components/editor/YouTubeLive";
+import { cn } from "@/lib/cn";
 import { documents } from "@/lib/workspace/documents";
+import { headingId } from "@/lib/workspace/slug";
 import type { DocumentContent } from "@/lib/workspace/types";
+import { useWorkbench } from "@/state/workbench-context";
 
 const KEYWORDS = new Set([
   "export",
@@ -29,7 +33,7 @@ export function DocumentView({ id }: { id: string }) {
     return <CodeView doc={doc} />;
   }
 
-  return <MarkdownView doc={doc} />;
+  return <MarkdownView key={id} doc={doc} />;
 }
 
 function MarkdownView({
@@ -37,6 +41,15 @@ function MarkdownView({
 }: {
   doc: Extract<DocumentContent, { kind: "markdown" }>;
 }) {
+  const { revealHeading, clearRevealHeading } = useWorkbench();
+
+  useEffect(() => {
+    if (!revealHeading) return;
+    const node = document.getElementById(revealHeading);
+    node?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const timeout = window.setTimeout(() => clearRevealHeading(), 1600);
+    return () => window.clearTimeout(timeout);
+  }, [revealHeading, clearRevealHeading]);
   return (
     <article className="mx-auto w-full max-w-[720px] px-5 py-8 md:px-8 md:py-10">
       <p className="mb-3 text-[11px] tracking-[0.14em] text-dim uppercase">
@@ -58,10 +71,15 @@ function MarkdownView({
             );
           }
           if (block.type === "h2") {
+            const id = headingId(block.text);
             return (
               <h2
                 key={index}
-                className="border-b border-line pt-4 pb-1.5 text-[18px] font-semibold text-fg"
+                id={id}
+                className={cn(
+                  "scroll-mt-4 border-b border-line pt-4 pb-1.5 text-[18px] font-semibold text-fg",
+                  revealHeading === id && "bg-selection/60",
+                )}
               >
                 {block.text}
               </h2>

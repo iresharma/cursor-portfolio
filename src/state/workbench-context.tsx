@@ -24,10 +24,14 @@ type WorkbenchState = {
   commandPaletteOpen: boolean;
   statusMessage: string | null;
   searchQuery: string;
+  revealHeading: string | null;
+  revealSymbolId: string | null;
 };
 
 type Action =
-  | { type: "open-file"; id: string }
+  | { type: "open-file"; id: string; heading?: string; symbolId?: string }
+  | { type: "clear-reveal" }
+  | { type: "clear-reveal-heading" }
   | { type: "close-tab"; id: string }
   | { type: "activate-tab"; id: string }
   | { type: "toggle-expanded"; id: string }
@@ -50,6 +54,8 @@ const initialState: WorkbenchState = {
   commandPaletteOpen: false,
   statusMessage: null,
   searchQuery: "",
+  revealHeading: null,
+  revealSymbolId: null,
 };
 
 function unique(ids: string[]): string[] {
@@ -70,6 +76,8 @@ function reducer(state: WorkbenchState, action: Action): WorkbenchState {
         activeTabId: action.id,
         expandedIds: unique([...state.expandedIds, ...ancestors]),
         commandPaletteOpen: false,
+        revealHeading: action.heading ?? null,
+        revealSymbolId: action.symbolId ?? null,
       };
     }
     case "close-tab": {
@@ -82,8 +90,17 @@ function reducer(state: WorkbenchState, action: Action): WorkbenchState {
           : state.activeTabId;
       return { ...state, tabs, activeTabId: nextActive };
     }
+    case "clear-reveal":
+      return { ...state, revealHeading: null, revealSymbolId: null };
+    case "clear-reveal-heading":
+      return { ...state, revealHeading: null };
     case "activate-tab":
-      return { ...state, activeTabId: action.id };
+      return {
+        ...state,
+        activeTabId: action.id,
+        revealHeading: null,
+        revealSymbolId: null,
+      };
     case "toggle-expanded": {
       const expanded = state.expandedIds.includes(action.id)
         ? state.expandedIds.filter((id) => id !== action.id)
@@ -116,7 +133,7 @@ function reducer(state: WorkbenchState, action: Action): WorkbenchState {
 }
 
 type WorkbenchContextValue = WorkbenchState & {
-  openFile: (id: string) => void;
+  openFile: (id: string, options?: { heading?: string; symbolId?: string }) => void;
   closeTab: (id: string) => void;
   activateTab: (id: string) => void;
   toggleExpanded: (id: string) => void;
@@ -128,6 +145,8 @@ type WorkbenchContextValue = WorkbenchState & {
   setCommandPaletteOpen: (open: boolean) => void;
   flashStatus: (message: string) => void;
   setSearchQuery: (query: string) => void;
+  clearReveal: () => void;
+  clearRevealHeading: () => void;
 };
 
 const WorkbenchContext = createContext<WorkbenchContextValue | null>(null);
@@ -185,7 +204,13 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
   const value = useMemo<WorkbenchContextValue>(
     () => ({
       ...state,
-      openFile: (id) => dispatch({ type: "open-file", id }),
+      openFile: (id, options) =>
+        dispatch({
+          type: "open-file",
+          id,
+          heading: options?.heading,
+          symbolId: options?.symbolId,
+        }),
       closeTab: (id) => dispatch({ type: "close-tab", id }),
       activateTab: (id) => dispatch({ type: "activate-tab", id }),
       toggleExpanded: (id) => dispatch({ type: "toggle-expanded", id }),
@@ -198,6 +223,8 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
         dispatch({ type: "set-command-palette", open }),
       flashStatus,
       setSearchQuery: (query) => dispatch({ type: "set-search", query }),
+      clearReveal: () => dispatch({ type: "clear-reveal" }),
+      clearRevealHeading: () => dispatch({ type: "clear-reveal-heading" }),
     }),
     [state, flashStatus],
   );
