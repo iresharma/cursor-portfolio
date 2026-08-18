@@ -42,11 +42,13 @@ export function Sidebar({ className }: { className?: string }) {
       </div>
 
       {sidebarView === "explorer" ? (
-        <div className="flex min-h-0 flex-1 flex-col overflow-auto pb-3">
-          <SidebarSection title={fileTree.name}>
-            <FileTree nodes={fileTree.children ?? []} />
-          </SidebarSection>
-          <div className="mt-3">
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-auto">
+            <SidebarSection title={fileTree.name}>
+              <FileTree nodes={fileTree.children ?? []} />
+            </SidebarSection>
+          </div>
+          <div className="min-h-0 flex-1 overflow-auto border-t border-line">
             <SidebarSection title="Outline">
               <Outline />
             </SidebarSection>

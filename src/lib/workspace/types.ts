@@ -41,6 +41,12 @@ export type MarkdownBlock =
   | { type: "h2"; text: string }
   | { type: "ul"; items: string[] }
   | { type: "callout"; text: string }
+  | {
+      type: "quote";
+      text: string;
+      source: string;
+      href?: string;
+    }
   | { type: "links"; items: Array<{ label: string; href: string }> }
   | { type: "live"; source: "youtube" | "blog" | "gaming" };
 

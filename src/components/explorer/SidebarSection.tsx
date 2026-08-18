@@ -20,7 +20,7 @@ export function SidebarSection({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <section className="min-h-0">
+    <section className="shrink-0">
       <div className="flex h-8 items-center gap-0.5 px-2 md:h-6">
         <button
           type="button"

@@ -1,6 +1,7 @@
 "use client";
 
 import { Group, Panel, Separator } from "react-resizable-panels";
+import { useEffect } from "react";
 import { ChatPanel } from "@/components/chat/ChatPanel";
 import { EditorPane } from "@/components/editor/EditorPane";
 import { Sidebar } from "@/components/explorer/Sidebar";
@@ -9,18 +10,29 @@ import { CommandPalette } from "@/components/workbench/CommandPalette";
 import { StatusBar } from "@/components/workbench/StatusBar";
 import { TitleBar } from "@/components/workbench/TitleBar";
 import { cn } from "@/lib/cn";
+import { isProjectFile } from "@/lib/projects";
 import { useWorkbench, WorkbenchProvider } from "@/state/workbench-context";
 
-export function Workbench() {
+export function Workbench({ initialFileId }: { initialFileId?: string }) {
   return (
-    <WorkbenchProvider>
+    <WorkbenchProvider initialFileId={initialFileId}>
       <WorkbenchShell />
     </WorkbenchProvider>
   );
 }
 
 function WorkbenchShell() {
-  const { sidebarOpen, chatOpen } = useWorkbench();
+  const { sidebarOpen, chatOpen, activeTabId } = useWorkbench();
+
+  useEffect(() => {
+    const next =
+      activeTabId && isProjectFile(activeTabId)
+        ? `/projects/${activeTabId}`
+        : "/";
+    if (window.location.pathname !== next) {
+      window.history.replaceState(window.history.state, "", next);
+    }
+  }, [activeTabId]);
 
   return (
     <div className="relative flex h-dvh max-h-dvh flex-col overflow-hidden bg-workbench text-fg">

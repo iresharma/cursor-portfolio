@@ -2,11 +2,18 @@ import { documents } from "@/lib/workspace/documents";
 import type { DocumentContent, MarkdownBlock } from "@/lib/workspace/types";
 import { SITE_DESCRIPTION } from "@/lib/site";
 
-export function CrawlerContent() {
+export function CrawlerContent({ ids }: { ids?: string[] }) {
+  const entries = ids
+    ? ids.flatMap((id) => {
+        const doc = documents[id];
+        return doc ? ([[id, doc]] as const) : [];
+      })
+    : Object.entries(documents);
+
   return (
     <section className="sr-only" aria-hidden="true">
       <p>{SITE_DESCRIPTION}</p>
-      {Object.entries(documents).map(([id, doc]) => (
+      {entries.map(([id, doc]) => (
         <article key={id}>
           <DocumentArticle doc={doc} />
         </article>
@@ -44,6 +51,19 @@ function Block({ block }: { block: MarkdownBlock }) {
     case "p":
     case "callout":
       return <p>{block.text}</p>;
+    case "quote":
+      return (
+        <blockquote>
+          <p>{block.text}</p>
+          <p>
+            {block.href ? (
+              <a href={block.href}>{block.source}</a>
+            ) : (
+              block.source
+            )}
+          </p>
+        </blockquote>
+      );
     case "ul":
       return (
         <ul>
