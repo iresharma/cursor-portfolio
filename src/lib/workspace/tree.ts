@@ -15,7 +15,7 @@ export const fileTree: WorkspaceNode = {
     { id: "projects", name: "projects.ts", kind: "file", language: "typescript" },
     {
       id: "projects-dir",
-      name: "projects",
+      name: "major-projects",
       kind: "folder",
       children: [
         { id: "codeloom", name: "codeloom.md", kind: "file", language: "markdown" },
