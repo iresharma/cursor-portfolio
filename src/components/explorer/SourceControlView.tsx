@@ -17,7 +17,7 @@ const changes = [
     id: "gaming",
     name: "extras/gaming.md",
     language: "markdown" as const,
-    status: "U",
+    status: "M",
   },
 ];
 
