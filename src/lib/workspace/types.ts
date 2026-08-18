@@ -1,0 +1,39 @@
+export type FileLanguage = "markdown" | "typescript" | "json";
+
+export type NodeKind = "file" | "folder";
+
+export type WorkspaceNode = {
+  id: string;
+  name: string;
+  kind: NodeKind;
+  language?: FileLanguage;
+  children?: WorkspaceNode[];
+};
+
+export type OutlineItem = {
+  id: string;
+  name: string;
+  hint: string;
+};
+
+export type MarkdownBlock =
+  | { type: "p"; text: string }
+  | { type: "h2"; text: string }
+  | { type: "ul"; items: string[] }
+  | { type: "callout"; text: string }
+  | { type: "links"; items: Array<{ label: string; href: string }> };
+
+export type DocumentContent =
+  | {
+      kind: "markdown";
+      title: string;
+      status: "draft" | "stub" | "live";
+      blocks: MarkdownBlock[];
+    }
+  | {
+      kind: "code";
+      language: "typescript";
+      lines: string[];
+    };
+
+export type SidebarView = "explorer" | "search" | "scm";
