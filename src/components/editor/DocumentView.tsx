@@ -1,5 +1,6 @@
 "use client";
 
+import { YouTubeLive } from "@/components/editor/YouTubeLive";
 import { documents } from "@/lib/workspace/documents";
 import type { DocumentContent } from "@/lib/workspace/types";
 
@@ -39,26 +40,26 @@ function MarkdownView({
       <p className="mb-3 text-[11px] tracking-[0.14em] text-dim uppercase">
         {doc.status}
       </p>
-      <h1 className="mb-5 text-[24px] leading-tight font-semibold tracking-tight text-fg md:mb-6 md:text-[28px]">
+      <h1 className="mb-5 border-b border-line pb-3 text-[24px] leading-tight font-semibold tracking-tight text-fg md:mb-6 md:text-[28px]">
         {doc.title}
       </h1>
       <div className="space-y-4 text-[15px] leading-7 text-muted">
         {doc.blocks.map((block, index) => {
           if (block.type === "callout") {
             return (
-              <p
+              <blockquote
                 key={index}
-                className="rounded-md border border-line bg-[#232323] px-4 py-3 text-[13px] text-muted"
+                className="border-l-2 border-accent/70 bg-[#232323] px-4 py-3 text-[13px] text-muted"
               >
                 {block.text}
-              </p>
+              </blockquote>
             );
           }
           if (block.type === "h2") {
             return (
               <h2
                 key={index}
-                className="pt-4 text-[18px] font-semibold text-fg"
+                className="border-b border-line pt-4 pb-1.5 text-[18px] font-semibold text-fg"
               >
                 {block.text}
               </h2>
@@ -90,6 +91,9 @@ function MarkdownView({
                 ))}
               </ul>
             );
+          }
+          if (block.type === "live") {
+            return <YouTubeLive key={index} />;
           }
           return <p key={index}>{block.text}</p>;
         })}

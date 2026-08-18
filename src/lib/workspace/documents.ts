@@ -300,7 +300,12 @@ export const documents: Record<string, DocumentContent> = {
       },
       {
         type: "p",
-        text: "If you wanted a polished creator-economy funnel you came to the wrong extras folder. Subscribe if you like Voice infra by day and watching someone debug a TTS fallback ladder by night.",
+        text: "If you wanted a polished creator-economy funnel you came to the wrong extras folder. Subscribe if you like Voice infra by day and watching someone debug a TTS fallback ladder by night. Numbers below are live-ish. The jokes are cached forever.",
+      },
+      { type: "live", source: "youtube" },
+      {
+        type: "h2",
+        text: "Elsewhere",
       },
       {
         type: "links",
