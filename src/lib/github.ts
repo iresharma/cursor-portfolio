@@ -31,6 +31,8 @@ export type GithubSnapshot = {
   profile: GithubProfile;
   fetchedAt: string;
   items: GithubTimelineItem[];
+  stale?: boolean;
+  warning?: "rate_limited" | "upstream";
 };
 
 export function shortRepoName(fullName: string, login: string): string {

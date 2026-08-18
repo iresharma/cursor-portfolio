@@ -6,7 +6,7 @@ import type {
 } from "@/lib/github";
 
 const API = "https://api.github.com";
-const REVALIDATE_SECONDS = 5 * 60;
+export const GITHUB_REVALIDATE_SECONDS = 900;
 const TIMELINE_LIMIT = 40;
 const REPO_LOOKBACK_MS = 90 * 24 * 60 * 60 * 1000;
 const USER_AGENT =
@@ -84,15 +84,35 @@ function usernameFromEnv(): string {
   return process.env.GITHUB_USERNAME?.trim() || "iresharma";
 }
 
+function githubToken(): string | undefined {
+  return process.env.GITHUB_TOKEN?.trim() || undefined;
+}
+
 function githubHeaders(): HeadersInit {
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "User-Agent": USER_AGENT,
     "X-GitHub-Api-Version": "2022-11-28",
   };
-  const token = process.env.GITHUB_TOKEN?.trim();
+  const token = githubToken();
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
+}
+
+export class GithubUpstreamError extends Error {
+  readonly status: number;
+  readonly rateLimited: boolean;
+
+  constructor(message: string, status: number, rateLimited: boolean) {
+    super(message);
+    this.name = "GithubUpstreamError";
+    this.status = status;
+    this.rateLimited = rateLimited;
+  }
+}
+
+function isRateLimited(response: Response): boolean {
+  return response.status === 429 || response.status === 403;
 }
 
 async function githubGet<T>(
@@ -106,26 +126,33 @@ async function githubGet<T>(
 
   const response = await fetch(url, {
     headers: githubHeaders(),
-    next: { revalidate: REVALIDATE_SECONDS },
+    cache: "force-cache",
+    next: { revalidate: GITHUB_REVALIDATE_SECONDS },
   });
 
   if (!response.ok) {
-    throw new Error(`GitHub ${path} failed with ${response.status}`);
+    throw new GithubUpstreamError(
+      `GitHub ${path} failed with ${response.status}`,
+      response.status,
+      isRateLimited(response),
+    );
   }
 
   return (await response.json()) as T;
 }
 
-async function githubGetOptional<T>(
-  path: string,
-  params?: Record<string, string>,
-): Promise<T | null> {
-  try {
-    return await githubGet<T>(path, params);
-  } catch {
-    return null;
-  }
+function fallbackProfile(login: string): GithubSnapshot["profile"] {
+  return {
+    login,
+    name: null,
+    url: `https://github.com/${login}`,
+    avatarUrl: `https://github.com/${login}.png`,
+    repos: 0,
+    followers: 0,
+  };
 }
+
+let memoryCache: GithubSnapshot | null = null;
 
 function firstLine(message: string): string {
   return message.split("\n")[0]?.trim() || message.trim();
@@ -364,33 +391,50 @@ function addMissingSearchItems(
   return extra;
 }
 
-export async function getGithubSnapshot(): Promise<GithubSnapshot> {
+async function fetchFreshSnapshot(): Promise<GithubSnapshot> {
   const login = usernameFromEnv();
+  const token = githubToken();
+  const failures: GithubUpstreamError[] = [];
 
-  const [user, events, repos, commitSearch, prSearch] = await Promise.all([
-    githubGet<GithubUser>(`/users/${login}`),
-    githubGetOptional<GithubEvent[]>(`/users/${login}/events/public`, {
-      per_page: "100",
-    }),
-    githubGetOptional<GithubRepo[]>(`/users/${login}/repos`, {
-      sort: "created",
-      direction: "desc",
-      per_page: "10",
-      type: "owner",
-    }),
-    githubGetOptional<SearchCommitsResponse>("/search/commits", {
+  async function optional<T>(
+    path: string,
+    params?: Record<string, string>,
+  ): Promise<T | null> {
+    try {
+      return await githubGet<T>(path, params);
+    } catch (error) {
+      if (error instanceof GithubUpstreamError) failures.push(error);
+      return null;
+    }
+  }
+
+  const user = await optional<GithubUser>(`/users/${login}`);
+  const events = await optional<GithubEvent[]>(`/users/${login}/events/public`, {
+    per_page: "100",
+  });
+  const repos = await optional<GithubRepo[]>(`/users/${login}/repos`, {
+    sort: "created",
+    direction: "desc",
+    per_page: "10",
+    type: "owner",
+  });
+
+  let commitSearch: SearchCommitsResponse | null = null;
+  let prSearch: SearchIssuesResponse | null = null;
+  if (token) {
+    commitSearch = await optional<SearchCommitsResponse>("/search/commits", {
       q: `author:${login}`,
       sort: "author-date",
       order: "desc",
       per_page: "30",
-    }),
-    githubGetOptional<SearchIssuesResponse>("/search/issues", {
+    });
+    prSearch = await optional<SearchIssuesResponse>("/search/issues", {
       q: `author:${login} type:pr`,
       sort: "updated",
       order: "desc",
       per_page: "30",
-    }),
-  ]);
+    });
+  }
 
   const commitsBySha = new Map<string, { title: string; url: string }>();
   for (const commit of commitSearch?.items ?? []) {
@@ -425,19 +469,56 @@ export async function getGithubSnapshot(): Promise<GithubSnapshot> {
   }
 
   items.push(...addMissingRepos(items, repos ?? []));
-
   items.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
 
+  if (!user && items.length === 0) {
+    throw (
+      failures.find((error) => error.rateLimited) ??
+      failures[0] ??
+      new GithubUpstreamError("GitHub returned no timeline data", 502, false)
+    );
+  }
+
   return {
-    profile: {
-      login: user.login,
-      name: user.name ?? null,
-      url: user.html_url,
-      avatarUrl: user.avatar_url,
-      repos: user.public_repos,
-      followers: user.followers,
-    },
+    profile: user
+      ? {
+          login: user.login,
+          name: user.name ?? null,
+          url: user.html_url,
+          avatarUrl: user.avatar_url,
+          repos: user.public_repos,
+          followers: user.followers,
+        }
+      : memoryCache?.profile ?? fallbackProfile(login),
     fetchedAt: new Date().toISOString(),
     items: items.slice(0, TIMELINE_LIMIT),
   };
+}
+
+export async function getGithubSnapshot(): Promise<GithubSnapshot> {
+  try {
+    const snapshot = await fetchFreshSnapshot();
+    memoryCache = snapshot;
+    return snapshot;
+  } catch (error) {
+    if (memoryCache) {
+      return { ...memoryCache, stale: true, warning: snapshotWarning(error) };
+    }
+    return {
+      profile: fallbackProfile(usernameFromEnv()),
+      fetchedAt: new Date().toISOString(),
+      items: [],
+      stale: true,
+      warning: snapshotWarning(error),
+    };
+  }
+}
+
+function snapshotWarning(
+  error: unknown,
+): GithubSnapshot["warning"] {
+  if (error instanceof GithubUpstreamError && error.rateLimited) {
+    return "rate_limited";
+  }
+  return "upstream";
 }

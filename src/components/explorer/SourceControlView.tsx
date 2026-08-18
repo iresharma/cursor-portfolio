@@ -22,7 +22,7 @@ import { formatCount } from "@/lib/youtube";
 type LoadState =
   | { status: "loading" }
   | { status: "ready"; data: GithubSnapshot }
-  | { status: "error" };
+  | { status: "error"; reason: "rate_limited" | "upstream" };
 
 type Filter = "all" | GithubTimelineKind;
 
@@ -33,14 +33,55 @@ const FILTERS: Array<{ id: Filter; label: string }> = [
   { id: "repo", label: "Repos" },
 ];
 
-async function fetchSnapshot(): Promise<LoadState> {
-  const response = await fetch("/api/github");
-  if (!response.ok) return { status: "error" };
-  const data = (await response.json()) as GithubSnapshot;
-  if (!data?.profile || !Array.isArray(data.items)) {
-    return { status: "error" };
+const CACHE_KEY = "iresharma.github-timeline";
+
+function readCache(): GithubSnapshot | null {
+  if (typeof sessionStorage === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw) as GithubSnapshot;
+    if (!data?.profile || !Array.isArray(data.items)) return null;
+    return data;
+  } catch {
+    return null;
   }
-  return { status: "ready", data };
+}
+
+function writeCache(data: GithubSnapshot) {
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.setItem(CACHE_KEY, JSON.stringify(data));
+  } catch {
+    // private mode, quota, whatever. The timeline still renders.
+  }
+}
+
+async function fetchSnapshot(): Promise<LoadState> {
+  const cached = readCache();
+  try {
+    const response = await fetch("/api/github");
+    if (!response.ok) {
+      if (cached) return { status: "ready", data: { ...cached, stale: true } };
+      const payload = (await response.json().catch(() => null)) as {
+        error?: string;
+      } | null;
+      return {
+        status: "error",
+        reason: payload?.error === "rate_limited" ? "rate_limited" : "upstream",
+      };
+    }
+    const data = (await response.json()) as GithubSnapshot;
+    if (!data?.profile || !Array.isArray(data.items)) {
+      if (cached) return { status: "ready", data: { ...cached, stale: true } };
+      return { status: "error", reason: "upstream" };
+    }
+    writeCache(data);
+    return { status: "ready", data };
+  } catch {
+    if (cached) return { status: "ready", data: { ...cached, stale: true } };
+    return { status: "error", reason: "upstream" };
+  }
 }
 
 export function SourceControlView() {
@@ -60,7 +101,7 @@ export function SourceControlView() {
       })
       .catch(() => {
         if (requestId.current !== id) return;
-        setState({ status: "error" });
+        setState({ status: "error", reason: "upstream" });
       });
   }, []);
 
@@ -76,7 +117,7 @@ export function SourceControlView() {
       })
       .catch(() => {
         if (requestId.current !== id) return;
-        setState({ status: "error" });
+        setState({ status: "error", reason: "upstream" });
         setRefreshing(false);
       });
   }, []);
@@ -118,14 +159,18 @@ export function SourceControlView() {
           {state.status === "loading" ? <TimelineSkeleton /> : null}
           {state.status === "error" ? (
             <p className="px-4 py-3 text-[12px] text-dim italic">
-              GitHub blinked. The history is still on github.com/iresharma.
+              {state.reason === "rate_limited"
+                ? "GitHub's anonymous quota melted. Add a GITHUB_TOKEN, or wait until the hour resets."
+                : "GitHub blinked. The history is still on github.com/iresharma."}
             </p>
           ) : null}
           {state.status === "ready" && visible.length === 0 ? (
             <p className="px-4 py-3 text-[12px] text-dim italic">
-              {filter === "all"
-                ? "No public activity in the recent pile. Either a sabbatical or the API is shy."
-                : "Nothing in this filter. GitHub has opinions about what counts."}
+              {state.data.warning === "rate_limited"
+                ? "GitHub's anonymous quota melted. Add a GITHUB_TOKEN, or wait until the hour resets."
+                : filter === "all"
+                  ? "No public activity in the recent pile. Either a sabbatical or the API is shy."
+                  : "Nothing in this filter. GitHub has opinions about what counts."}
             </p>
           ) : null}
           {state.status === "ready" && visible.length > 0 ? (
@@ -161,7 +206,7 @@ function Header({
   const profile = state.status === "ready" ? state.data.profile : null;
   const refreshed =
     state.status === "ready"
-      ? formatRefreshed(state.data.fetchedAt, now)
+      ? formatRefreshed(state.data.fetchedAt, now, state.data.stale)
       : null;
 
   return (
@@ -266,8 +311,11 @@ function TimelineSkeleton() {
   );
 }
 
-function formatRefreshed(iso: string, now: number): string {
+function formatRefreshed(iso: string, now: number, stale?: boolean): string {
   const relative = formatRelativeTime(iso, now);
+  if (stale) {
+    return relative === "just now" ? "cached" : `cached ${relative} ago`;
+  }
   return relative === "just now" ? "just now" : `fetched ${relative} ago`;
 }
 
