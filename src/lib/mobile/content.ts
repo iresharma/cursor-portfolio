@@ -30,7 +30,7 @@ export const CHIPS: Chip[] = [
     label: "Hobbies",
     prompt: "What do you do when you are not shipping?",
     reply:
-      "Basketball, 3D printing, IoT, photography, hip-hop — extras/hobbies.md. Games live in extras/gaming.md: Valorant iresharma#noob, PSN iresharma, Steam iresharma. Tracker.gg has the rank. I will not screenshot it here.",
+      "Basketball, 3D printing, IoT, photography, hip-hop — extras/hobbies.md. Games live in extras/gaming.md: Valorant iresharma#noob, PSN iresharma, Steam ireshrma. Tracker.gg has the rank. I will not screenshot it here.",
   },
   {
     id: "writing",

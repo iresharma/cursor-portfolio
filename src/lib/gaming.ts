@@ -20,9 +20,9 @@ export const GAMING_ACCOUNTS: GamingAccount[] = [
   },
   {
     platform: "steam",
-    id: "iresharma",
+    id: "ireshrma",
     tracker: "steamcommunity",
-    href: "https://steamcommunity.com/id/iresharma",
+    href: "https://steamcommunity.com/id/ireshrma",
   },
 ];
 
@@ -40,7 +40,7 @@ export const GAMING_TRACKERS: Array<{ label: string; href: string }> = [
     href: "https://psnprofiles.com/iresharma",
   },
   {
-    label: "steamcommunity.com/id/iresharma — the Valve half",
-    href: "https://steamcommunity.com/id/iresharma",
+    label: "steamcommunity.com/id/ireshrma — the Valve half",
+    href: "https://steamcommunity.com/id/ireshrma",
   },
 ];

@@ -266,7 +266,7 @@ export const documents: Record<string, DocumentContent> = {
       },
       {
         type: "p",
-        text: "Hobbies.md got the analog stuff. This file is ranked anxiety with URLs. Riot ID iresharma#noob, PSN iresharma, Steam iresharma. Add me if the tag does not scare you.",
+        text: "Hobbies.md got the analog stuff. This file is ranked anxiety with URLs. Riot ID iresharma#noob, PSN iresharma, Steam ireshrma. Add me if the tag does not scare you.",
       },
       {
         type: "p",
