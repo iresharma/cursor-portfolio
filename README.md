@@ -8,7 +8,8 @@ Software engineering portfolio with two surfaces:
 ## Where content lives
 
 - File tree: `src/lib/workspace/tree.ts`
-- Page bodies: `src/lib/workspace/documents.ts`
+- Page bodies: `src/lib/workspace/documents.ts` plus `src/lib/workspace/project-documents.ts`
+- Featured projects: `/projects/codeloom`, `/projects/lens-distill`, `/projects/seeksphere`, `/projects/reach`, `/projects/g-notify`
 - Mobile chips and copy: `src/lib/mobile/content.ts`
 - Agent: `src/lib/agent/` plus `POST /api/chat` (OpenRouter, 5-message quota)
 

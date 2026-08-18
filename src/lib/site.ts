@@ -48,6 +48,11 @@ export const siteMetadata: Metadata = {
     "Voice infra",
     "TypeScript",
     "WatchIreshStruggle",
+    "CodeLoom",
+    "Lens Distill",
+    "SeekSphere",
+    "Reach",
+    "G-Notify",
   ],
   category: "portfolio",
   referrer: "origin-when-cross-origin",
@@ -92,6 +97,23 @@ export const siteMetadata: Metadata = {
 
 export function jsonLdScript(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
+}
+
+export function projectJsonLd(project: {
+  slug: string;
+  title: string;
+  description: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    headline: project.title,
+    description: project.description,
+    url: `${SITE_URL}/projects/${project.slug}`,
+    author: { "@id": `${SITE_URL}/#person` },
+    publisher: { "@id": `${SITE_URL}/#person` },
+    inLanguage: "en",
+  };
 }
 
 export function personJsonLd() {

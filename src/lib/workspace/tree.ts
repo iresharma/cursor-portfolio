@@ -14,6 +14,18 @@ export const fileTree: WorkspaceNode = {
     { id: "career", name: "career.md", kind: "file", language: "markdown" },
     { id: "projects", name: "projects.ts", kind: "file", language: "typescript" },
     {
+      id: "projects-dir",
+      name: "projects",
+      kind: "folder",
+      children: [
+        { id: "codeloom", name: "codeloom.md", kind: "file", language: "markdown" },
+        { id: "lens-distill", name: "lens-distill.md", kind: "file", language: "markdown" },
+        { id: "seeksphere", name: "seeksphere.md", kind: "file", language: "markdown" },
+        { id: "reach", name: "reach.md", kind: "file", language: "markdown" },
+        { id: "g-notify", name: "g-notify.md", kind: "file", language: "markdown" },
+      ],
+    },
+    {
       id: "extras",
       name: "extras",
       kind: "folder",
@@ -28,4 +40,4 @@ export const fileTree: WorkspaceNode = {
 };
 
 export const DEFAULT_OPEN_FILE = "readme";
-export const DEFAULT_EXPANDED = ["root", "extras"];
+export const DEFAULT_EXPANDED = ["root", "projects-dir", "extras"];

@@ -23,7 +23,7 @@ export const CHIPS: Chip[] = [
     label: "Projects",
     prompt: "What has Iresh actually shipped?",
     reply:
-      "Reach, a creator work desk that became a lifestyle. G-Notify, because Gmail would not send HTML to my GDSC core team. A Shorts generator that renders a vertical video in ~22 seconds on CPU. Lens Distill, a pipeline that read Venture Deals for me after I failed three times. Also: git-accounts-manager, a GPay redesign in Flutter, a templating engine called Sapphire, and a 2019 streaming server. github.com/iresharma is the rest of the confession.",
+      "The long versions live in projects/: CodeLoom (Devin-shaped agent, tree-sitter plus LSP), Lens Distill (seven-stage claim pipeline on Venture Deals), SeekSphere (NL search that compiles to SQL), Reach (Remix to a Go/gRPC k8s circus), G-Notify (Gmail APIs, no nodemailer). The index is projects.ts. The systems are the markdown.",
   },
   {
     id: "hobbies",

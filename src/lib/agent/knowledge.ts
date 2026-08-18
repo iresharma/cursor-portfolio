@@ -13,6 +13,12 @@ function serializeDocument(id: string, doc: DocumentContent): string {
       case "callout":
         lines.push(block.text);
         break;
+      case "quote":
+        lines.push(`> ${block.text}`);
+        lines.push(
+          `  — ${block.source}${block.href ? ` (${block.href})` : ""}`,
+        );
+        break;
       case "h2":
         lines.push(`## ${block.text}`);
         break;

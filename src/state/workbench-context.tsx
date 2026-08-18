@@ -151,8 +151,26 @@ type WorkbenchContextValue = WorkbenchState & {
 
 const WorkbenchContext = createContext<WorkbenchContextValue | null>(null);
 
-export function WorkbenchProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initialState);
+export function WorkbenchProvider({
+  children,
+  initialFileId,
+}: {
+  children: ReactNode;
+  initialFileId?: string;
+}) {
+  const startId =
+    initialFileId && getOpenable(initialFileId)
+      ? initialFileId
+      : DEFAULT_OPEN_FILE;
+  const [state, dispatch] = useReducer(reducer, {
+    ...initialState,
+    tabs: [startId],
+    activeTabId: startId,
+    expandedIds: unique([
+      ...DEFAULT_EXPANDED,
+      ...getAncestorIds(startId),
+    ]),
+  });
 
   const flashStatus = useCallback((message: string) => {
     dispatch({ type: "set-status", message });

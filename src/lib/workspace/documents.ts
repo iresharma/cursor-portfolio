@@ -1,4 +1,5 @@
 import { GAMING_TRACKERS } from "@/lib/gaming";
+import { projectDocuments } from "./project-documents";
 import type { DocumentContent } from "./types";
 
 export const documents: Record<string, DocumentContent> = {
@@ -28,9 +29,10 @@ export const documents: Record<string, DocumentContent> = {
         items: [
           "about.md — the human patch notes.",
           "career.md — jobs, in chronological self-roast.",
-          "projects.ts — things I built instead of going outside.",
+          "projects.ts — the index. projects/ — the actual writeups.",
+          "projects/codeloom.md, lens-distill.md, seeksphere.md, reach.md, g-notify.md — roast, then the real systems.",
           "extras/ — hobbies, gaming (PSN, Steam, Valorant), YouTube, the blog.",
-          "Outline — individual posts, because I process trauma as markdown.",
+          "Outline — posts and projects, because I process trauma as markdown.",
         ],
       },
       {
@@ -64,7 +66,7 @@ export const documents: Record<string, DocumentContent> = {
       },
       {
         type: "p",
-        text: "The through-line is not a stack. It is 'I would rather build the tool than do the chore.' G-Notify exists because Gmail would not send HTML. The Shorts generator exists because making vertical videos by hand felt like a war crime. Lens Distill exists because I could not finish Venture Deals. This portfolio exists because a normal landing page felt like lying.",
+        text: "The through-line is not a stack. It is 'I would rather build the tool than do the chore.' G-Notify exists because Gmail would not send HTML. The Shorts generator exists because making vertical videos by hand felt like a war crime. Lens Distill exists because I could not finish Venture Deals. SeekSphere exists because filter drawers are a query planner with worse UX. CodeLoom exists because grep is not comprehension. This portfolio exists because a normal landing page felt like lying. The long versions are in projects/.",
       },
       {
         type: "h2",
@@ -146,6 +148,7 @@ export const documents: Record<string, DocumentContent> = {
     lines: [
       "// iresharma/projects.ts",
       "// compiled from github, linkedin, and poor impulse control",
+      "// long versions: projects/codeloom.md, lens-distill.md, seeksphere.md, reach.md, g-notify.md",
       "",
       "export type Project = {",
       "  name: string;",
@@ -162,6 +165,27 @@ export const documents: Record<string, DocumentContent> = {
       "};",
       "",
       "export const shipped: Project[] = [",
+      "  {",
+      "    name: \"CodeLoom\",",
+      "    pitch: \"Devin-shaped agent: explore, patch, test, open a PR. You keep merge\",",
+      "    stack: [\"tree-sitter\", \"LSP\", \"Claude tool-use\", \"a while loop\"],",
+      "    shipped: true,",
+      "    originStory: \"educative attempt, typo in the GitHub bio, four landing pages\",",
+      "  },",
+      "  {",
+      "    name: \"Lens Distill\",",
+      "    pitch: \"PDF plus a topic lens becomes claims, a vocabulary, and a concept graph\",",
+      "    stack: [\"Next.js\", \"Neon pgvector\", \"Haiku\", \"Sonnet\", \"Opus\"],",
+      "    shipped: true,",
+      "    originStory: \"I could not finish Venture Deals. I built a pipeline. I still have not read Venture Deals.\",",
+      "  },",
+      "  {",
+      "    name: \"SeekSphere\",",
+      "    pitch: \"natural language in, SQL-shaped catalog results out, Clerk-shaped SDK\",",
+      "    stack: [\"intent classifier\", \"LLM-to-SQL\", \"MCP connectors\", \"@seeksphere/sdk\"],",
+      "    shipped: true,",
+      "    originStory: \"filters are a query planner with worse UX. SuperTokens muscle memory.\",",
+      "  },",
       "  {",
       "    name: \"Reach\",",
       "    pitch: \"work desk for creators who also have a calendar, inbox, and a Shopify tab they should close\",",
@@ -182,13 +206,6 @@ export const documents: Record<string, DocumentContent> = {
       "    stack: [\"Python\", \"MoviePy\", \"Coqui TTS\", \"five fallbacks because TTS is a gaslight\"],",
       "    shipped: true,",
       "    originStory: \"open sourced because paying for faceless-video SaaS felt like a skill issue\",",
-      "  },",
-      "  {",
-      "    name: \"Lens Distill\",",
-      "    pitch: \"PDF plus a topic lens becomes claims, a vocabulary, and a concept graph\",",
-      "    stack: [\"Next.js\", \"Neon pgvector\", \"Haiku\", \"Sonnet\", \"Opus\", \"my unfinished reading list\"],",
-      "    shipped: true,",
-      "    originStory: \"I could not finish Venture Deals. I built a pipeline. I still have not read Venture Deals.\",",
       "  },",
       "  {",
       "    name: \"git-accounts-manager\",",
@@ -224,6 +241,8 @@ export const documents: Record<string, DocumentContent> = {
       "  \"create-react-app-v2 — I forked the generator because the official one made me refactor\",",
       "  \"106 public repos — this is not a flex, it is a cry for help\",",
       "];",
+      "",
+      "// The index is a bit. The systems are in projects/*.md.",
       "",
     ],
   },
@@ -442,4 +461,5 @@ export const documents: Record<string, DocumentContent> = {
       },
     ],
   },
+  ...projectDocuments,
 };

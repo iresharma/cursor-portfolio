@@ -70,6 +70,29 @@ function MarkdownView({
               </blockquote>
             );
           }
+          if (block.type === "quote") {
+            return (
+              <figure key={index} className="my-5">
+                <blockquote className="border-l-2 border-[#d7ba7d]/80 pl-4 text-[15px] leading-7 text-fg italic">
+                  {block.text}
+                </blockquote>
+                <figcaption className="mt-2 pl-4 text-[11px] tracking-[0.04em] text-dim">
+                  {block.href ? (
+                    <a
+                      href={block.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-accent hover:underline"
+                    >
+                      {block.source}
+                    </a>
+                  ) : (
+                    block.source
+                  )}
+                </figcaption>
+              </figure>
+            );
+          }
           if (block.type === "h2") {
             const id = headingId(block.text);
             return (
