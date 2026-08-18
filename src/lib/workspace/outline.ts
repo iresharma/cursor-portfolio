@@ -1,4 +1,3 @@
-import { PROJECT_PAGES } from "@/lib/projects";
 import type { OutlineItem, OutlineSymbol } from "./types";
 import { headingId } from "./slug";
 
@@ -131,21 +130,6 @@ export const careerTimeline: OutlineSymbol[] = [
   origin,
 ];
 
-export const projectsOutline: OutlineSymbol = {
-  id: "tl-projects",
-  label: "Projects",
-  detail: "the long versions",
-  kind: "module",
-  fileId: "projects",
-  children: PROJECT_PAGES.map((project) => ({
-    id: `proj-${project.id}`,
-    label: project.fileName,
-    detail: project.year,
-    kind: "markdown" as const,
-    fileId: project.id,
-  })),
-};
-
 export const writingOutline: OutlineSymbol = {
   id: "tl-writing",
   label: "Writing",
@@ -199,7 +183,7 @@ export function outlineTree(oldestFirst = false): OutlineSymbol[] {
           children: node.children ? node.children.slice().reverse() : undefined,
         }))
     : careerTimeline;
-  return [...career, projectsOutline, writingOutline];
+  return [...career, writingOutline];
 }
 
 export function expandableIds(nodes: OutlineSymbol[]): string[] {
