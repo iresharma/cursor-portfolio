@@ -1,4 +1,6 @@
-import type { OutlineItem, WorkspaceNode } from "./types";
+import type { WorkspaceNode } from "./types";
+
+export { outlineItems } from "./outline";
 
 export const WORKSPACE_NAME = "iresharma";
 
@@ -24,24 +26,6 @@ export const fileTree: WorkspaceNode = {
     },
   ],
 };
-
-export const outlineItems: OutlineItem[] = [
-  {
-    id: "post-agents",
-    name: "why-agents-read-code-three-ways.md",
-    hint: "2026",
-  },
-  {
-    id: "post-venture",
-    name: "i-never-finished-venture-deals.md",
-    hint: "2026",
-  },
-  {
-    id: "post-shorts",
-    name: "youtube-shorts-in-22-seconds.md",
-    hint: "2025",
-  },
-];
 
 export const DEFAULT_OPEN_FILE = "readme";
 export const DEFAULT_EXPANDED = ["root", "extras"];

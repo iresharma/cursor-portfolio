@@ -9,23 +9,29 @@ import {
   type KeyboardEvent,
 } from "react";
 import { BootScreen } from "@/components/mobile/BootScreen";
+import { BROKE_MESSAGE } from "@/lib/agent/copy";
+import { useAgentChat, type UiMessage } from "@/lib/agent/use-agent-chat";
 import { cn } from "@/lib/cn";
-import { askAgent } from "@/lib/mobile/agent";
 import { ABOUT_MESSAGE, CHIPS } from "@/lib/mobile/content";
 
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-};
+const SEED: UiMessage[] = [
+  { id: "about", role: "assistant", content: ABOUT_MESSAGE },
+];
 
 export function MobileExperience() {
   const [booting, setBooting] = useState(true);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: "about", role: "assistant", content: ABOUT_MESSAGE },
-  ]);
+  const {
+    messages,
+    remaining,
+    closed,
+    closeReason,
+    pending,
+    ready,
+    exhausted,
+    send,
+    reset,
+  } = useAgentChat(SEED);
   const [draft, setDraft] = useState("");
-  const [pending, setPending] = useState(false);
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,40 +45,29 @@ export function MobileExperience() {
       top: scrollerRef.current.scrollHeight,
       behavior: "smooth",
     });
-  }, [messages, pending]);
+  }, [messages, pending, exhausted]);
 
-  const send = async (text: string) => {
+  const submit = (text: string) => {
     const prompt = text.trim();
-    if (!prompt || pending) return;
-
+    if (!prompt || pending || closed) return;
     setDraft("");
-    setPending(true);
-    setMessages((current) => [
-      ...current,
-      { id: crypto.randomUUID(), role: "user", content: prompt },
-    ]);
-
-    const reply = await askAgent(prompt);
-    window.setTimeout(() => {
-      setMessages((current) => [
-        ...current,
-        { id: crypto.randomUUID(), role: "assistant", content: reply },
-      ]);
-      setPending(false);
-    }, 380);
+    void send(prompt);
   };
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
-    void send(draft);
+    submit(draft);
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
-      void send(draft);
+      submit(draft);
     }
   };
+
+  const locked = closed || remaining <= 0;
+  const showChips = !locked && !pending;
 
   if (booting) {
     return (
@@ -91,7 +86,9 @@ export function MobileExperience() {
           </span>
           <div className="min-w-0">
             <p className="text-[15px] font-medium text-fg">Iresh Sharma</p>
-            <p className="text-[12px] text-dim">Agent · stub mode</p>
+            <p className="text-[12px] text-dim">
+              Agent · {exhausted ? "broke" : ready ? `${remaining} left` : "…"}
+            </p>
           </div>
         </div>
         <p className="mt-3 rounded-lg border border-line bg-[#1a1a1a] px-3 py-2 text-[12px] leading-5 text-muted">
@@ -118,15 +115,14 @@ export function MobileExperience() {
                   <p className="text-muted">{message.content}</p>
                 )}
               </div>
-              {index === 0 && message.id === "about" ? (
+              {index === 0 && message.id === "about" && showChips ? (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {CHIPS.map((chip) => (
                     <button
                       key={chip.id}
                       type="button"
-                      disabled={pending}
-                      onClick={() => void send(chip.prompt)}
-                      className="rounded-full border border-line bg-[#1a1a1a] px-3.5 py-2 text-[13px] text-muted active:bg-hover disabled:opacity-50"
+                      onClick={() => submit(chip.prompt)}
+                      className="rounded-full border border-line bg-[#1a1a1a] px-3.5 py-2 text-[13px] text-muted active:bg-hover"
                     >
                       {chip.label}
                     </button>
@@ -145,15 +141,14 @@ export function MobileExperience() {
       </div>
 
       <div className="shrink-0 px-5 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        {messages.length > 1 ? (
+        {showChips && messages.length > 1 ? (
           <div className="mb-3 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {CHIPS.map((chip) => (
               <button
                 key={chip.id}
                 type="button"
-                disabled={pending}
-                onClick={() => void send(chip.prompt)}
-                className="shrink-0 rounded-full border border-line bg-[#1a1a1a] px-3.5 py-2 text-[13px] text-muted active:bg-hover disabled:opacity-50"
+                onClick={() => submit(chip.prompt)}
+                className="shrink-0 rounded-full border border-line bg-[#1a1a1a] px-3.5 py-2 text-[13px] text-muted active:bg-hover"
               >
                 {chip.label}
               </button>
@@ -161,26 +156,48 @@ export function MobileExperience() {
           </div>
         ) : null}
 
-        <form onSubmit={onSubmit}>
-          <div className="flex items-end gap-2 rounded-2xl border border-line bg-[#1f1f1f] px-3 py-2">
-            <textarea
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              onKeyDown={onKeyDown}
-              rows={1}
-              placeholder="Ask about Iresh"
-              className="max-h-28 min-h-11 flex-1 resize-none bg-transparent py-2 text-base leading-5 text-fg outline-none placeholder:text-dim"
-            />
-            <button
-              type="submit"
-              disabled={!draft.trim() || pending}
-              aria-label="Send"
-              className="mb-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-[#2b2b2b] text-fg disabled:text-dim"
-            >
-              <ArrowUp className="size-4" strokeWidth={2.2} />
-            </button>
+        {locked ? (
+          <div className="rounded-2xl border border-line bg-[#1f1f1f] px-3.5 py-3">
+            <p className="text-[13px] leading-5 text-dim">
+              {closeReason === "off-topic" && !exhausted
+                ? "Chat closed. That was not about Iresh."
+                : BROKE_MESSAGE}
+            </p>
+            {closeReason === "off-topic" && !exhausted ? (
+              <button
+                type="button"
+                onClick={() => {
+                  reset();
+                  setDraft("");
+                }}
+                className="mt-2 text-[12px] text-muted underline-offset-2 hover:text-fg hover:underline"
+              >
+                New chat
+              </button>
+            ) : null}
           </div>
-        </form>
+        ) : (
+          <form onSubmit={onSubmit}>
+            <div className="flex items-end gap-2 rounded-2xl border border-line bg-[#1f1f1f] px-3 py-2">
+              <textarea
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={onKeyDown}
+                rows={1}
+                placeholder="Ask about Iresh"
+                className="max-h-28 min-h-11 flex-1 resize-none bg-transparent py-2 text-base leading-5 text-fg outline-none placeholder:text-dim"
+              />
+              <button
+                type="submit"
+                disabled={!draft.trim() || pending}
+                aria-label="Send"
+                className="mb-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-[#2b2b2b] text-fg disabled:text-dim"
+              >
+                <ArrowUp className="size-4" strokeWidth={2.2} />
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

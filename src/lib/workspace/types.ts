@@ -16,6 +16,26 @@ export type OutlineItem = {
   hint: string;
 };
 
+export type SymbolKind =
+  | "class"
+  | "method"
+  | "function"
+  | "module"
+  | "property"
+  | "enum"
+  | "constant"
+  | "markdown";
+
+export type OutlineSymbol = {
+  id: string;
+  label: string;
+  detail?: string;
+  kind: SymbolKind;
+  fileId: string;
+  heading?: string;
+  children?: OutlineSymbol[];
+};
+
 export type MarkdownBlock =
   | { type: "p"; text: string }
   | { type: "h2"; text: string }
