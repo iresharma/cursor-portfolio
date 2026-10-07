@@ -132,8 +132,9 @@ function OutlineNode({
           ) : null}
         </button>
       </div>
-      {open
-        ? kids.map((child) => (
+      {open ? (
+        <ul>
+          {kids.map((child) => (
             <OutlineNode
               key={child.id}
               symbol={child}
@@ -141,8 +142,9 @@ function OutlineNode({
               expanded={expanded}
               onToggle={onToggle}
             />
-          ))
-        : null}
+          ))}
+        </ul>
+      ) : null}
     </li>
   );
 }
