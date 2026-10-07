@@ -42,7 +42,14 @@ function verify(raw: string): number | null {
   if (!timingSafeEqual(left, right)) return null;
 
   const sep = payload.indexOf(".");
-  if (sep <= 0) return null;
+  if (sep <= 0) {
+    // Legacy cookie from before the monthly reset (no month in the
+    // payload). Signature still checks out, but there's nothing to
+    // compare the month against, so treat it as expired rather than
+    // as corrupt/invalid.
+    const legacyUsed = Number(payload);
+    return Number.isInteger(legacyUsed) && legacyUsed >= 0 ? 0 : null;
+  }
   const used = Number(payload.slice(0, sep));
   const month = payload.slice(sep + 1);
   if (!Number.isInteger(used) || used < 0) return null;
