@@ -18,7 +18,13 @@ export const fileTree: WorkspaceNode = {
       name: "major-projects",
       kind: "folder",
       children: [
-        { id: "codeloom", name: "codeloom.md", kind: "file", language: "markdown" },
+        {
+          id: "codeloom",
+          name: "codeloom.md",
+          kind: "file",
+          language: "markdown",
+          decoration: { letter: "M", title: "Modified — six repos and an agent since you last looked" },
+        },
         { id: "lens-distill", name: "lens-distill.md", kind: "file", language: "markdown" },
         { id: "seeksphere", name: "seeksphere.md", kind: "file", language: "markdown" },
         { id: "reach", name: "reach.md", kind: "file", language: "markdown" },

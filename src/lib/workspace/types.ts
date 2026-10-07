@@ -8,6 +8,7 @@ export type WorkspaceNode = {
   kind: NodeKind;
   language?: FileLanguage;
   children?: WorkspaceNode[];
+  decoration?: { letter: string; title: string };
 };
 
 export type OutlineItem = {
@@ -48,7 +49,7 @@ export type MarkdownBlock =
       href?: string;
     }
   | { type: "links"; items: Array<{ label: string; href: string }> }
-  | { type: "live"; source: "youtube" | "blog" | "gaming" };
+  | { type: "live"; source: "youtube" | "blog" | "gaming" | "codeloom" };
 
 export type DocumentContent =
   | {

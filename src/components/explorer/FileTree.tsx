@@ -3,6 +3,7 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { FileGlyph } from "@/components/icons/FileGlyph";
 import { SidebarRow } from "@/components/explorer/SidebarSection";
+import { cn } from "@/lib/cn";
 import type { WorkspaceNode } from "@/lib/workspace/types";
 import { useWorkbench } from "@/state/workbench-context";
 
@@ -59,7 +60,15 @@ function FileTreeNode({
       >
         <span className="inline-block w-3.5" />
         <FileGlyph kind="file" language={node.language} />
-        <span className="truncate">{node.name}</span>
+        <span className={cn("truncate", node.decoration && "text-[#e2c08d]")}>{node.name}</span>
+        {node.decoration ? (
+          <span
+            title={node.decoration.title}
+            className="ml-auto pl-2 text-[12px] font-semibold text-[#e2c08d]"
+          >
+            {node.decoration.letter}
+          </span>
+        ) : null}
       </SidebarRow>
     </li>
   );

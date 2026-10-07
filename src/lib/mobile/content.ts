@@ -23,7 +23,7 @@ export const CHIPS: Chip[] = [
     label: "Projects",
     prompt: "What has Iresh actually shipped?",
     reply:
-      "The long versions live in projects/: CodeLoom (Devin-shaped agent, tree-sitter plus LSP), Lens Distill (seven-stage claim pipeline on Venture Deals), SeekSphere (NL search that compiles to SQL), Reach (Remix to a Go/gRPC k8s circus), G-Notify (Gmail APIs, no nodemailer). The index is projects.ts. The systems are the markdown.",
+      "The long versions live in projects/: CodeLoom (coding agent across six repos — engine, cloud sandboxes, web, Go TUI — that opens PRs on its own repo), Lens Distill (seven-stage claim pipeline on Venture Deals), SeekSphere (NL search that compiles to SQL), Reach (Remix to a Go/gRPC k8s circus), G-Notify (Gmail APIs, no nodemailer). The index is projects.ts. The systems are the markdown.",
   },
   {
     id: "hobbies",

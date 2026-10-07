@@ -17,9 +17,9 @@ export const PROJECT_PAGES: ProjectPageMeta[] = [
     title: "CodeLoom",
     product: "autonomous coding agent",
     year: "2026",
-    tagline: "A Devin-shaped agent that explores, plans, patches, tests, and opens a PR.",
+    tagline: "An engine, six subagents, cloud sandboxes, and a PR at the end. It opens PRs on itself.",
     description:
-      "CodeLoom is Iresh Sharma's educational coding-agent family — agent, IDE, TUI, and CLI — built around repo comprehension with tree-sitter and LSP, then a patch/test/PR loop.",
+      "CodeLoom is Iresh Sharma's coding agent: a Python engine speaking NDJSON over a Unix socket, an orchestrator with six subagent personalities in git worktrees, a guarded write funnel, tree-sitter and LSP, Docker sandboxes, and web and Go TUI clients.",
   },
   {
     id: "lens-distill",

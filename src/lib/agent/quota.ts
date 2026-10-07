@@ -12,6 +12,10 @@ export type Quota = {
   exhausted: boolean;
 };
 
+function currentMonth(): string {
+  return new Date().toISOString().slice(0, 7); // YYYY-MM
+}
+
 function secret(): string {
   return (
     process.env.AGENT_QUOTA_SECRET?.trim() ||
@@ -21,23 +25,28 @@ function secret(): string {
 }
 
 function sign(used: number): string {
-  const payload = String(used);
+  const payload = `${used}.${currentMonth()}`;
   const mac = createHmac("sha256", secret()).update(payload).digest("hex");
   return `${payload}.${mac}`;
 }
 
 function verify(raw: string): number | null {
-  const dot = raw.indexOf(".");
-  if (dot <= 0) return null;
-  const payload = raw.slice(0, dot);
-  const mac = raw.slice(dot + 1);
+  const lastDot = raw.lastIndexOf(".");
+  if (lastDot <= 0) return null;
+  const payload = raw.slice(0, lastDot);
+  const mac = raw.slice(lastDot + 1);
   const expected = createHmac("sha256", secret()).update(payload).digest("hex");
   const left = Buffer.from(mac);
   const right = Buffer.from(expected);
   if (left.length !== right.length) return null;
   if (!timingSafeEqual(left, right)) return null;
-  const used = Number(payload);
+
+  const sep = payload.indexOf(".");
+  if (sep <= 0) return null;
+  const used = Number(payload.slice(0, sep));
+  const month = payload.slice(sep + 1);
   if (!Number.isInteger(used) || used < 0) return null;
+  if (month !== currentMonth()) return 0; // quota resets each month
   return used;
 }
 
@@ -70,17 +79,21 @@ function toQuota(used: number): Quota {
   };
 }
 
+function ipKey(request: Request): string {
+  return `${clientKey(request)}:${currentMonth()}`;
+}
+
 export function readQuota(request: Request): Quota {
   const raw = cookieFromRequest(request);
   const fromCookie = raw ? verify(raw) : 0;
   const cookieUsed = fromCookie === null ? AGENT_MESSAGE_LIMIT : fromCookie;
-  const fromIp = ipUsed.get(clientKey(request)) ?? 0;
+  const fromIp = ipUsed.get(ipKey(request)) ?? 0;
   return toQuota(Math.max(cookieUsed, fromIp));
 }
 
 export function consumeQuota(request: Request): Quota {
   const next = toQuota(readQuota(request).used + 1);
-  ipUsed.set(clientKey(request), next.used);
+  ipUsed.set(ipKey(request), next.used);
   return next;
 }
 

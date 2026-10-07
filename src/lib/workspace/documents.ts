@@ -22,6 +22,21 @@ export const documents: Record<string, DocumentContent> = {
       },
       {
         type: "h2",
+        text: "Currently building",
+      },
+      {
+        type: "p",
+        text: "CodeLoom, a coding agent that has now opened more pull requests on its own repo than I have on most of mine. Engine, cloud sandboxes, a web client, a Go TUI: six repos, one socket. The receipts are in major-projects/codeloom.md, including the one where it failed to recognise itself as Python. The green dot in the status bar opens it. It will not stop bragging.",
+      },
+      {
+        type: "links",
+        items: [
+          { label: "codeloom.iresharma.com/engine/results — every run, itemised", href: "https://codeloom.iresharma.com/engine/results" },
+          { label: "github.com/iresharma/codeloom — the umbrella repo", href: "https://github.com/iresharma/codeloom" },
+        ],
+      },
+      {
+        type: "h2",
         text: "How to read this window",
       },
       {
@@ -66,7 +81,7 @@ export const documents: Record<string, DocumentContent> = {
       },
       {
         type: "p",
-        text: "The through-line is not a stack. It is 'I would rather build the tool than do the chore.' G-Notify exists because Gmail would not send HTML. The Shorts generator exists because making vertical videos by hand felt like a war crime. Lens Distill exists because I could not finish Venture Deals. SeekSphere exists because filter drawers are a query planner with worse UX. CodeLoom exists because grep is not comprehension. This portfolio exists because a normal landing page felt like lying. The long versions are in projects/.",
+        text: "The through-line is not a stack. It is 'I would rather build the tool than do the chore.' G-Notify exists because Gmail would not send HTML. The Shorts generator exists because making vertical videos by hand felt like a war crime. Lens Distill exists because I could not finish Venture Deals. SeekSphere exists because filter drawers are a query planner with worse UX. CodeLoom exists because grep is not comprehension, and now it reviews its own pull requests. This portfolio exists because a normal landing page felt like lying. The long versions are in projects/.",
       },
       {
         type: "h2",
@@ -167,10 +182,10 @@ export const documents: Record<string, DocumentContent> = {
       "export const shipped: Project[] = [",
       "  {",
       "    name: \"CodeLoom\",",
-      "    pitch: \"Devin-shaped agent: explore, patch, test, open a PR. You keep merge\",",
-      "    stack: [\"tree-sitter\", \"LSP\", \"Claude tool-use\", \"a while loop\"],",
+      "    pitch: \"coding agent: orchestrator, six subagents, worktrees, a PR at the end. You keep merge\",",
+      "    stack: [\"Python engine\", \"FastAPI + Docker\", \"Next.js\", \"Go TUI\", \"tree-sitter\", \"LSP\"],",
       "    shipped: true,",
-      "    originStory: \"educative attempt, typo in the GitHub bio, four landing pages\",",
+      "    originStory: \"educative attempt, typo in the GitHub bio, now opens PRs on its own repo\",",
       "  },",
       "  {",
       "    name: \"Lens Distill\",",

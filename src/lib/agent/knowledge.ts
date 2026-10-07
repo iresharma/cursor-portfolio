@@ -1,3 +1,4 @@
+import { codeloomReceiptsText } from "@/lib/codeloom";
 import { documents } from "@/lib/workspace/documents";
 import type { DocumentContent } from "@/lib/workspace/types";
 
@@ -31,6 +32,10 @@ function serializeDocument(id: string, doc: DocumentContent): string {
         );
         break;
       case "live":
+        if (block.source === "codeloom") {
+          lines.push(codeloomReceiptsText());
+          break;
+        }
         lines.push(
           `(live ${block.source} widget on the site; treat counts as current-ish, jokes as cached)`,
         );
